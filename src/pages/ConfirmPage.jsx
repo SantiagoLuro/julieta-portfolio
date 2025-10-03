@@ -3,14 +3,15 @@ import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, User, CheckCircle, XCircle, Users, Utensils } from 'lucide-react';
+import { EVENT_CONFIG, SEO_CONFIG } from '@/config/eventConfig';
 
 // =================== CONFIG ===================
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwWAC77Q6eDfhBcwEb_p-R1M3JBMS_9vPC7JDLcUFYWniN0ku9VfFNY7D88zZDzD3sk/exec"; // <— tu URL
-const SHARED_SECRET = "abc123-martina-xv"; // Debe coincidir con Code.gs
+const WEB_APP_URL = EVENT_CONFIG.googleAppsScriptUrl;
+const SHARED_SECRET = EVENT_CONFIG.sharedSecret;
 // ==============================================
 
-/** Snackbar bottom-center opaco (negro) y notorio */
-const Snack = ({ open, kind = "success", title, desc, onClose, duration = 4500 }) => {
+/** Toast de confirmación elegante y visible */
+const Toast = ({ open, kind = "success", title, desc, onClose, duration = 5000 }) => {
   useEffect(() => {
     if (!open) return;
     const t = setTimeout(onClose, duration);
@@ -19,32 +20,45 @@ const Snack = ({ open, kind = "success", title, desc, onClose, duration = 4500 }
 
   if (!open) return null;
 
-  const base =
-    "pointer-events-auto max-w-[560px] w-[calc(100%-2rem)] md:w-auto rounded-xl px-4 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.6)]";
-  const style = {
-    backgroundColor: "#000", // opaco real
-    color: "#fff",
-    border: kind === "error" ? "1px solid rgba(255, 77, 77, 0.6)" : "1px solid rgba(255,255,255,0.08)",
-  };
+  const isSuccess = kind === "success";
+  const icon = isSuccess ? "🎉" : "❌";
+  const bgColor = isSuccess ? "rgba(34, 197, 94, 0.95)" : "rgba(239, 68, 68, 0.95)";
+  const borderColor = isSuccess ? "rgba(34, 197, 94, 0.8)" : "rgba(239, 68, 68, 0.8)";
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 100, scale: 0.8 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 100, scale: 0.8 }}
       className="fixed inset-x-0 bottom-0 flex justify-center z-[999] isolate pointer-events-none"
-      style={{ paddingBottom: 'calc(16px + env(safe-area-inset-bottom))' }}
+      style={{ paddingBottom: 'calc(20px + env(safe-area-inset-bottom))' }}
       role="status"
       aria-live="polite"
     >
-      <div className={base} style={style}>
-        <p className="font-semibold leading-tight">{title}</p>
-        {desc ? <p className="text-sm opacity-90 leading-snug break-words">{desc}</p> : null}
-        <button
-          onClick={onClose}
-          className="mt-1 text-sm opacity-80 hover:opacity-100 underline underline-offset-2"
-        >
-          Cerrar
-        </button>
+      <div
+        className="pointer-events-auto max-w-[90vw] md:max-w-[500px] w-full mx-4 rounded-2xl px-6 py-4 shadow-[0_20px_60px_rgba(0,0,0,0.8)] backdrop-blur-md"
+        style={{
+          backgroundColor: bgColor,
+          border: `2px solid ${borderColor}`,
+          color: "#fff",
+        }}
+      >
+        <div className="flex items-start gap-3">
+          <div className="text-2xl flex-shrink-0">{icon}</div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-lg leading-tight mb-1">{title}</p>
+            {desc && <p className="text-sm opacity-90 leading-snug break-words">{desc}</p>}
+          </div>
+          <button
+            onClick={onClose}
+            className="flex-shrink-0 text-white/80 hover:text-white text-lg font-bold leading-none"
+            aria-label="Cerrar notificación"
+          >
+            ×
+          </button>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -55,9 +69,9 @@ const ConfirmPage = () => {
   const [restricciones, setRestricciones] = useState('');
   const [enviando, setEnviando] = useState(false);
 
-  // estado snackbar
-  const [snack, setSnack] = useState({ open: false, kind: "success", title: "", desc: "" });
-  const showSnack = (kind, title, desc) => setSnack({ open: true, kind, title, desc });
+  // estado toast
+  const [toast, setToast] = useState({ open: false, kind: "success", title: "", desc: "" });
+  const showToast = (kind, title, desc) => setToast({ open: true, kind, title, desc });
 
   const resetForm = () => {
     setAsistencia('');
@@ -97,7 +111,7 @@ const ConfirmPage = () => {
     setEnviando(false);
 
     if (ok) {
-      showSnack(
+      showToast(
         "success",
         "¡Confirmación recibida!",
         `Gracias ${payload.nombre}. ${
@@ -107,15 +121,15 @@ const ConfirmPage = () => {
       resetForm();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      showSnack("error", "Hubo un problema", "Intentá nuevamente más tarde.");
+      showToast("error", "Hubo un problema", "Intentá nuevamente más tarde.");
     }
   };
 
   return (
     <>
       <Helmet>
-        <title>Confirmar Asistencia - XV de Martina</title>
-        <meta name="description" content="Confirma tu asistencia a la fiesta de XV de Martina." />
+        <title>Confirmar Asistencia - {EVENT_CONFIG.eventTitle}</title>
+        <meta name="description" content={`Confirma tu asistencia a la fiesta de ${EVENT_CONFIG.eventType.toLowerCase()} de ${EVENT_CONFIG.name}.`} />
       </Helmet>
 
       <motion.div
@@ -267,13 +281,13 @@ const ConfirmPage = () => {
         </motion.div>
       </motion.div>
 
-      {/* Snackbar opaco y notorio */}
-      <Snack
-        open={snack.open}
-        kind={snack.kind}
-        title={snack.title}
-        desc={snack.desc}
-        onClose={() => setSnack((s) => ({ ...s, open: false }))}
+      {/* Toast de confirmación elegante */}
+      <Toast
+        open={toast.open}
+        kind={toast.kind}
+        title={toast.title}
+        desc={toast.desc}
+        onClose={() => setToast((s) => ({ ...s, open: false }))}
       />
     </>
   );

@@ -50,6 +50,17 @@ module.exports = {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))',
 				},
+				// Colores personalizados del tema de eventos
+				'event-primary': '#8b0000',    // Bordó
+				'event-secondary': '#d4af37',  // Dorado
+				'event-accent': '#50010c',     // Púrpura oscuro
+			},
+			fontFamily: {
+				'playfair': ['Playfair Display', 'serif'],
+				'poppins': ['Poppins', 'sans-serif'],
+				'great-vibes': ['Great Vibes', 'cursive'],
+				'sprite-graffiti': ['Sprite Graffiti', 'system-ui', 'sans-serif'],
+				'klemer-display': ['Klemer Display', 'serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

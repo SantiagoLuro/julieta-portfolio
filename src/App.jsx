@@ -9,6 +9,7 @@ import AlbumView from '@/pages/AlbumView';
 import MusicPage from '@/pages/MusicPage';
 import ConfirmPage from '@/pages/ConfirmPage';
 import AudioPlayer from "./components/AudioPlayer";
+import { EVENT_CONFIG } from '@/config/eventConfig';
 
 function App() {
   const location = useLocation();
@@ -50,7 +51,7 @@ function App() {
       {isHome && <FloatingParticles />}
 
       {/* Audio normal (sin overlay full-screen) */}
-      <AudioPlayer src="/maxi-trusso.mp3" />
+      <AudioPlayer src={EVENT_CONFIG.backgroundMusic} />
 
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
