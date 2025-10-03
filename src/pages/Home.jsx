@@ -9,15 +9,18 @@ import MusicSection from '@/components/MusicSection';
 import DressCode from '@/components/DressCode';
 import RSVP from '@/components/RSVP';
 import Footer from '@/components/Footer';
+import { EVENT_CONFIG, SEO_CONFIG } from '@/config/eventConfig';
 
 const Home = () => {
   return (
     <>
       <Helmet>
-        <title>XV Años de Martina - ¡Celebremos Juntos!</title>
-        <meta name="description" content="Te invitamos a celebrar los XV años de Martina. Una noche mágica llena de música, baile y momentos inolvidables." />
-        <meta property="og:title" content="XV Años de Martina - ¡Celebremos Juntos!" />
-        <meta property="og:description" content="Te invitamos a celebrar los XV años de Martina. Una noche mágica llena de música, baile y momentos inolvidables." />
+        <title>{SEO_CONFIG.title}</title>
+        <meta name="description" content={SEO_CONFIG.description} />
+        <meta property="og:title" content={SEO_CONFIG.title} />
+        <meta property="og:description" content={SEO_CONFIG.description} />
+        <meta property="og:image" content={SEO_CONFIG.ogImage} />
+        <meta name="keywords" content={SEO_CONFIG.keywords.join(', ')} />
       </Helmet>
       
       <div className="min-h-screen relative">
