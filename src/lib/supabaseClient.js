@@ -1,10 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
+// src/lib/supabaseClient.js
+// Supabase deshabilitado para esta landing.
+// Evitamos importar '@supabase/supabase-js' para que compile en Vercel.
+export const supabase = null;
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-
-
-// ⚡ luego usá `supabase` en tus componentes para interactuar con la base de datos
+// Si en alguna parte del código hay algo como supabase?.from(...),
+// no va a romper (pero obviamente no hará nada).
